@@ -4,8 +4,9 @@ app.use(express.json());
 
 app.post('/v1/chat/completions', async (req, res) => {
   try {
-    const messages = req.body.messages || [];
-    const userMessage = messages.filter(m => m.role === 'user').pop();
+    const mensagem = req.body.mensagem || 
+                     (req.body.messages && req.body.messages.filter(m => m.role === 'user').pop()?.content) || 
+                     '';
     
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -18,7 +19,7 @@ app.post('/v1/chat/completions', async (req, res) => {
         model: 'claude-haiku-4-5-20251001',
         max_tokens: 1024,
         system: process.env.SYSTEM_PROMPT || 'Você é um assistente da Arquitec Cursos.',
-        messages: [{ role: 'user', content: userMessage.content }]
+        messages: [{ role: 'user', content: mensagem }]
       })
     });
 
